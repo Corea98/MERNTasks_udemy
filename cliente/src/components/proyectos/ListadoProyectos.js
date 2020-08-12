@@ -3,13 +3,17 @@ import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
 import Proyecto from './Proyecto';
 
-import proyectoContext from '../../context/proyectos/proyectoContext';
+import ProyectoContext from '../../context/proyectos/proyectoContext';
+import AlertaContext from '../../context/alertas/alertaContext';
 
 const ListadoProyectos = () => {
 
     // Extraer proyectos de state inicial
-    const proyectosContext = useContext(proyectoContext);
-    const { proyectos, obtenerProyectos } = proyectosContext;
+    const proyectoContext = useContext(ProyectoContext);
+    const { mensaje, proyectos, obtenerProyectos } = proyectoContext;
+
+    const alertaContext = useContext(AlertaContext);
+    const { alerta, mostrarAlerta } = alertaContext;
 
     // Obtener proyectos cuando carga el componente
     useEffect(() => {
@@ -17,15 +21,25 @@ const ListadoProyectos = () => {
         // eslint-disable-next-line
     }, []);
 
+    // Para mostrar mensajes de error
+    useEffect(() => {
+        if (mensaje) {
+            mostrarAlerta(mensaje.msg, mensaje.categoria);
+        }
+        // eslint-disable-next-line
+    }, [mensaje])
+
     // Revisar si proyectos tiene contenido
     if (proyectos.length === 0) return <p>No hay proyectos</p>;
 
     return (
         <ul className="listado-proyectos">
+            { alerta ? (<div className={`alerta ${ alerta.categoria }`}>{alerta.msg}</div>) : null}
+
             <TransitionGroup>
                 {proyectos.map(proyecto => (
                     <CSSTransition
-                        key={proyecto.id}
+                        key={proyecto._id}
                         timeout={200}
                         classNames="proyecto"
                     >
